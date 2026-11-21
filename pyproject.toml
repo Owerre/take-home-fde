@@ -1,0 +1,17 @@
+[project]
+name = "cloudnova-track-b"
+version = "0.0.0"
+description = "CloudNova Track B — M1 specification checkpoint"
+requires-python = ">=3.13,<3.15"
+dependencies = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
