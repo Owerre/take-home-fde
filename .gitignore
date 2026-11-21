@@ -1,4 +1,5 @@
 # Private source data stays local; never publish customer rows.
+.DS_Store
 data/*.csv
 .env
 .env.*

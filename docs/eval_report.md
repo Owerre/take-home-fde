@@ -24,6 +24,7 @@ build hash exists. No model calls, token/cost measurements or live latency resul
 | Fresh stdlib-only virtual environment | PASS: `venv.EnvBuilder(with_pip=False)`; removed Anthropic/CloudNova/PYTHONPATH variables; regenerated identical report |
 | Report source-PII check | PASS: no source nonblank emails, account names or invoice IDs appear in report |
 | `git check-ignore data/cloudnova_invoices.csv` | PASS: private raw CSV excluded |
+| Staged whitespace check and final tracked-text scan | PASS: no whitespace errors; no source emails, names or invoice IDs in tracked text |
 
 The independent checks above were an executed inline Python verification, not an
 installed test suite. The profile itself is committed and reproducible. Initial
