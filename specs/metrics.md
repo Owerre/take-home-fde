@@ -1,4 +1,4 @@
-# Metric contracts — proposed, awaiting M1 approval
+# Metric contracts — approved at M1
 
 All money is USD; all invoice populations are deduplicated, retained and bounded
 by `invoice_date <= as_of_date` (S-ASOF-01). Refunds are negative source records.

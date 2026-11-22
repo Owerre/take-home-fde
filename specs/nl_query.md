@@ -1,4 +1,4 @@
-# Query interface and security — proposed, awaiting M1 approval
+# Query interface and security — approved at M1
 
 - **N-CLI-01:** Commands: `python -m app build`; `python -m app "question"`;
   `python -m app eval --tier 1`; `python -m app eval --tier 2`. Question command

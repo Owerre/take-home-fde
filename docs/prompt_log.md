@@ -12,3 +12,14 @@ No earlier AI transcript was supplied. The user's prior profiling findings are
 claims in the supplied prompt, independently checked by the profiling script.
 This is a manually maintained factual summary, not a complete tool transcript.
 No hidden reasoning or reconstructed prompts are represented as conversation.
+
+## Follow-up instructions (verbatim user messages)
+
+> commit and push https://github.com/Owerre/take-home-fde.git if all requirment are met
+
+Codex checked the repository, explained that implementation/evaluations were still
+missing, and asked whether the user approved the proposed specs and defaults.
+
+> yes
+
+This approval starts implementation and retains conditional publication authority.

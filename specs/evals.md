@@ -1,4 +1,4 @@
-# Evaluation contract — proposed, awaiting M1 approval
+# Evaluation contract — approved at M1
 
 - **E-OFF-01:** Tier 1 requires no network/key. Synthetic fixtures contain no real
   customer PII. Every case links rule IDs and supplies a frozen EvalCase; EvalRunner
@@ -61,4 +61,4 @@ build, offline eval and sample demo from a clean virtual environment. Real NL de
 requires credentials; offline replay is not represented as a real model query.
 Validate tracked files for PII/secrets before requesting publication authorization.
 
-The profiler is runnable at M1; no app, eval harness, tier-1 or live results exist yet.
+Execution status and actual results are recorded in docs/eval_report.md.

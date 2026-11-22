@@ -1,7 +1,7 @@
 # M1 business decision review
 
-**Status: proposed, not approved. Implementation is paused for the review required
-by step 5 of docs/build_brief.md.** The original exercise/briefing has been read;
+**Status: approved. The user answered “yes” to the explicit M1 approval question
+after requesting commit/push when requirements are met.** The original exercise/briefing has been read;
 source bytes are preserved and aggregate profiling is reproducible.
 
 ## Decisions for approval

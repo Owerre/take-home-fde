@@ -16,9 +16,10 @@ sent to an external model endpoint. Aggregate profiling remains local.
 - No arbitrary model SQL, customer data in model prompts, secrets, or PII in Git.
 - Keep raw inputs unchanged and private. Profile only aggregate statistics.
 - Record executed checks separately from planned checks; do not claim unrun passes.
-- No publication until user authorizes a concrete reviewed tracked-file set.
+- User authorized push to https://github.com/Owerre/take-home-fde.git once requirements pass.
+  Inspect tracked files before publishing; never publish private CSV, secrets or answers.
 - Do not delegate to subagents unless the user explicitly requests it.
 
 ## Current runnable command
 `python3 scripts/profile_data.py` regenerates docs/data_quality.md without credentials.
-Application/demo/evaluation commands are specified but not implemented at M1.
+M1 is approved; implement and validate the app and evaluations autonomously.

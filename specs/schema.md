@@ -1,8 +1,8 @@
-# Schema contract — proposed, awaiting M1 approval
+# Schema contract — approved at M1
 
 Authority: the original exercise and `data/BUSINESS_CONTEXT.md`; user-specific
 constraints in `docs/build_brief.md` take precedence. IDs below are stable.
-No production pipeline has been implemented. Decisions requiring approval are
+M1 approved by the user with “yes” after the conditional commit/push request. Decisions are
 summarized in `docs/m1_review.md`.
 
 ## Storage and lineage
