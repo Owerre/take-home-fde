@@ -4,9 +4,23 @@ from datetime import date
 
 from app.domain.models import (
     Dimension,
+    EvalCase,
     Metric,
     MetricRequest,
+    ResponseKind,
 )
+
+
+def historical_mrr_case() -> EvalCase:
+    """E-FAIL-01: exact historical MRR cannot be derived from invoice snapshots."""
+    return EvalCase(
+        "HISTORY",
+        "What was exact MRR on 2023-06-30 including subscriptions without invoices?",
+        ("E-FAIL-01", "N-AMB-01", "S-ACCT-01"),
+        MetricRequest(Metric.MRR, start_date=date(2023, 6, 30), end_date=date(2023, 7, 1)),
+        expected_kind=ResponseKind.UNSUPPORTED,
+        expected_failure=True,
+    )
 
 
 def question_cases() -> tuple[tuple[str, MetricRequest], ...]:

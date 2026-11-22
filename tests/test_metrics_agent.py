@@ -11,6 +11,7 @@ from app.agent.service import QueryAgent
 from app.config import Settings
 from app.domain.errors import CloudNovaError, QueryError, RequestError
 from app.domain.models import (
+    Answer,
     Dimension,
     Filter,
     Metric,
@@ -22,6 +23,7 @@ from app.domain.models import (
 )
 from app.evaluation.cases import question_cases
 from app.evaluation.reference import assert_evidence, assert_reference, reference_rows
+from app.evaluation.runner import evaluate_historical_mrr
 from app.infrastructure.database import execute_bounded, read_connection
 from app.metrics.compiler import MetricCompiler
 from app.metrics.validation import parse_request
@@ -38,6 +40,29 @@ class FakeClient:
         assert '"F-01"' not in metadata
         assert "contact_email" not in metadata
         return self.response
+
+
+@pytest.mark.parametrize("accepts_history", [False, True])
+def test_history_case_exercises_backend_and_detects_acceptance(
+    dataset: tuple[Settings, RunReport], monkeypatch: pytest.MonkeyPatch, accepts_history: bool
+) -> None:
+    settings, report = dataset
+    compiler = MetricCompiler(settings)
+    real_answer = compiler.answer
+    calls = 0
+
+    def answer(request: MetricRequest, build: RunReport) -> Answer:
+        nonlocal calls
+        calls += 1
+        if accepts_history:
+            return Answer(ResponseKind.METRIC)
+        return real_answer(request, build)
+
+    monkeypatch.setattr(compiler, "answer", answer)
+    outcome = evaluate_historical_mrr(compiler, report)
+    assert calls == 1
+    assert not outcome.passed
+    assert outcome.expected_failure is not accepts_history
 
 
 @pytest.mark.parametrize("index", range(6))

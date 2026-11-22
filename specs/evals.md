@@ -19,6 +19,10 @@
   PASS. None of the six stakeholder questions is an expected failure. Expected
   limitation failures appear in denominator and summary, not disguised as passes;
   exit 0 when no unexpected failures, nonzero on unexpected failure/error.
+  The offline history case must actually submit a dated MRR request to the
+  compiler. A RequestError for this unsupported request is the expected capability
+  failure; unexpected acceptance or another application error is an unexpected
+  failure. Do not manufacture this outcome without exercising the backend.
 - **E-REPORT-01:** docs/eval_report.md records exact executed commands, environment,
   reference date/build identity, model config (no key), pass/fail/not-run counts,
   failures and limitations. Report cost/latency only when actually measured; token

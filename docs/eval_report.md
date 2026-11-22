@@ -3,7 +3,7 @@
 **Local submission validated; publication is on hold.** All six stakeholder metric
 cases pass independent SQL and evidence checks. Tier 1 reports **12/13 PASS,
 1 expected limitation failure, 0 unexpected failures**. The regression suite passes
-**34 tests**. Live Anthropic accuracy is **NOT RUN** because credentials and model
+**36 tests**. Live Anthropic accuracy is **NOT RUN** because credentials and model
 configuration were absent.
 
 ## Configuration and reproducibility
@@ -12,7 +12,7 @@ configuration were absent.
 - Local Python 3.14.7; container Python 3.13.18, non-root UID 10001.
 - uv 0.13.9; DuckDB 1.5.6; Anthropic SDK 0.125.0; PyYAML 6.0.4; exact graph in uv.lock.
 - Source SHA-256: `f542bc1f8193ab367e0a009a7afe56620335ce23b5817f5edc0ed4f896c89d84`.
-- Verified host/container build identity: `3477ce9fcf5ef23af9e92fd5cd52d943823d9df3b36006db8d0364cf93dbaf04`.
+- Verified host/container build identity: `433d5f7ae2ffd3d9a88a9943d3518ca000c6e0ee48e1cc00c2177afd42c3391e`.
 - Baseline account_id key; no answer cache. No model, cost or live latency figures
   were measured. HTTP mock transport results are not live model results.
 
@@ -21,10 +21,10 @@ configuration were absent.
 | Check / command | Result |
 |---|---|
 | `uv sync --locked` in a fresh temporary virtual environment | PASS; exact dependencies installed |
-| `ruff format --check app tests evals scripts` | PASS; 35 files formatted |
+| `ruff format --check app tests evals scripts` | PASS; 34 files formatted |
 | `ruff check app tests evals scripts` | PASS |
 | `mypy` with strict configuration | PASS; 34 source files |
-| `pytest -q` | PASS; 34 tests |
+| `pytest -q` | PASS; 36 tests |
 | `python -m app build` on the real source | PASS; atomic artifact and complete row reconciliation |
 | `python -m app eval --tier 1` | 12 PASS; 1 expected FAIL; exit 0 |
 | Documented `uv run --locked python -m app eval --tier 1` in fresh environment, credentials removed | Same result; exit 0 |
@@ -81,11 +81,13 @@ under source-precision tolerance. No source amount was replaced.
 | FIX-EXPOSURE | PASS | Hand golden USD 157.00 |
 | FIX-MRR | PASS | Hand golden highest region MRR/account USD 88.20 |
 | FIX-CSAT | PASS | Low/known/unknown flags preserved on ranked accounts |
-| HISTORY | **FAIL — expected limitation** | Exact historical MRR needs subscription history not present in the ledger |
+| HISTORY | **FAIL — expected limitation** | Real dated MRR request rejected by the backend; exact subscription history unavailable |
 
-HISTORY is an explicit capability limitation scored as a failure and included in
-the denominator. It is not represented as a live NL execution or a model accuracy
-result. Ordinary unsupported/unsafe refusals are separate PASS expectations.
+HISTORY submits a dated MetricRequest to the real compiler and checks its
+rejection. The missing exact-history capability is scored as an expected failure
+and included in the denominator. Unexpected acceptance or another application
+error is an unexpected failure. This is an offline backend check, not live NL
+execution or a model accuracy result. Ordinary unsupported/unsafe refusals are separate PASS expectations.
 No stakeholder question is marked as an expected failure. Unexpected failures or
 errors produce nonzero exits; missing live configuration is reported as NOT RUN.
 
@@ -97,7 +99,10 @@ matched an invoice-ID substring inside a rule ID; the test was fixed. Strict typ
 errors were corrected, not suppressed. Generated alias CSV line endings were
 normalized for a clean Git diff. An initial clean-demo attempt was blocked by the
 execution sandbox's uv-cache permissions before the app ran; the documented demo
-then passed with cache access. All affected checks were rerun successfully.
+then passed with cache access. A deliverable audit also found that HISTORY originally declared a limitation
+without submitting a request. It now executes the backend, with regression tests
+for both rejection and unexpected acceptance. The README MRR formula was clarified
+to show the discount multiplier explicitly. All affected checks were rerun successfully.
 
 ## Remaining limits and effort
 
@@ -108,10 +113,12 @@ subscription states, causal churn or cash settlement. Status precedence is a
 convention without event timestamps; account identity remains uncertain. Raw data
 must be supplied through an authorized channel to reproduce a fresh clone.
 
-The user selected a 24-hour maximum. Estimated active effort so far is roughly
-**55 minutes**, including tool waits and excluding the multi-hour M1 review wait;
+The user selected a 24-hour maximum. Estimated cumulative active effort is roughly
+**65 minutes**, including tool waits and excluding the multi-hour M1 review wait;
 this is an estimate, not a stopwatch measurement or a one-hour-compliance claim.
-M1 was approximately 8 minutes; the observed implementation/check interval began
+The initial implementation estimate was 55 minutes; subsequent documentation
+cleanup and the deliverable audit added approximately 10 minutes. M1 was
+approximately 8 minutes; the observed implementation/check interval began
 at 00:30:44 UTC on 2026-11-22 and reached 01:11:42 UTC, with preliminary setup and
 final cleanup outside those clock readings. No GitHub push or image publication
 was performed. Another day should prioritize Finance reconciliation of customer

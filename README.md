@@ -62,7 +62,7 @@ The source reconciles **5,125 = 5,000 retained + 125 duplicate losers + 0 reject
 At reference date **2026-11-21**, 103 future invoices remain stored and are excluded
 from answers. Fixed FX follows the briefing despite the source-generation anomaly;
 no billed amount is silently repaired. Annual bills ten months; MRR uses list
-price × seats × discount once/account, independent of billing cycle.
+price × seats × (1 − discount_pct/100) once/account, independent of billing cycle.
 
 Baseline account identity is account_id, with coherent latest eligible invoice
 snapshots. Active MRR is a paid/nonchurned proxy; regional averages include inactive

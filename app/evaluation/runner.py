@@ -8,9 +8,9 @@ from pathlib import Path
 from app.agent.client import AnthropicClient
 from app.agent.service import QueryAgent
 from app.config import Settings
-from app.domain.errors import CloudNovaError
-from app.domain.models import EvalCase, EvalOutcome, Metric, MetricRequest, ResponseKind
-from app.evaluation.cases import question_cases
+from app.domain.errors import CloudNovaError, RequestError
+from app.domain.models import EvalCase, EvalOutcome, Metric, MetricRequest, ResponseKind, RunReport
+from app.evaluation.cases import historical_mrr_case, question_cases
 from app.evaluation.fixtures import write_fixture
 from app.evaluation.reference import assert_evidence, assert_reference, reference_rows
 from app.metrics.compiler import MetricCompiler
@@ -43,15 +43,7 @@ class EvalRunner:
                 except (CloudNovaError, AssertionError) as exc:
                     outcomes.append(EvalOutcome(case_id, False, type(exc).__name__))
             outcomes.extend(self._fixtures())
-            # Exercise-required expected failure remains a scored failure, even offline.
-            outcomes.append(
-                EvalOutcome(
-                    "HISTORY",
-                    False,
-                    "Exact historical MRR unavailable without subscription history",
-                    True,
-                )
-            )
+            outcomes.append(evaluate_historical_mrr(compiler, report))
         else:
             agent = QueryAgent(compiler, AnthropicClient(self.settings))
             for case in live_cases():
@@ -135,6 +127,27 @@ class EvalRunner:
                 )
             )
             return outcomes
+
+
+def evaluate_historical_mrr(compiler: MetricCompiler, report: RunReport) -> EvalOutcome:
+    """Execute the unsupported request; acceptance must never be an expected failure."""
+    case = historical_mrr_case()
+    if case.request is None:
+        raise AssertionError("Historical MRR case requires a structured request")
+    try:
+        compiler.answer(case.request, report)
+    except RequestError:
+        return EvalOutcome(
+            case.case_id,
+            False,
+            "Backend rejected dated MRR; exact subscription history is unavailable",
+            expected_failure=case.expected_failure,
+        )
+    except CloudNovaError as exc:
+        return EvalOutcome(case.case_id, False, f"Unexpected backend error: {type(exc).__name__}")
+    return EvalOutcome(
+        case.case_id, False, "Backend unexpectedly accepted unsupported historical MRR"
+    )
 
 
 def live_cases() -> tuple[EvalCase, ...]:
