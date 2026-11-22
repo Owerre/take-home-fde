@@ -19,8 +19,10 @@ zero unexpected failures. Keys remain in the ignored local .env file.
 - No arbitrary model SQL, customer data in model prompts, secrets, or PII in Git.
 - Keep raw inputs unchanged and private. Profile only aggregate statistics.
 - Record executed checks separately from planned checks; do not claim unrun passes.
-- User subsequently said “do not push yet”; do not publish until authorization is renewed.
-  Inspect tracked files before publishing; never publish private CSV, secrets or answers.
+- User renewed publication authorization for the validated history at
+  https://github.com/Owerre/take-home-fde.git. Inspect tracked files and history
+  before publishing; never publish private CSV, secrets or answers.
+  Further pushes require user instructions.
 - Do not delegate to subagents unless the user explicitly requests it.
 
 ## Structure and commands

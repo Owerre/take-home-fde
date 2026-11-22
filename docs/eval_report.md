@@ -1,6 +1,6 @@
 # Validation report
 
-**Local submission validated; publication is on hold.** All six stakeholder metric
+**Validated for submission.** All six stakeholder metric
 cases pass independent SQL and evidence checks. Tier 1 reports **12/13 PASS,
 1 expected limitation failure, 0 unexpected failures**. The regression suite passes
 **38 tests**. Live Tier 2 with **claude-fable-5-2** reports **29/30 PASS,
@@ -142,6 +142,7 @@ The initial implementation estimate was 55 minutes; follow-up cleanup, audits
 and live integration troubleshooting added approximately 30 minutes. M1 was
 approximately 8 minutes; the observed implementation/check interval began
 at 00:30:44 UTC on 2026-11-22 and reached 01:11:42 UTC, with preliminary setup and
-final cleanup outside those clock readings. No GitHub push or image publication
-was performed. Another day should prioritize Finance reconciliation of customer
+final cleanup outside those clock readings. GitHub destination:
+[Owerre/take-home-fde](https://github.com/Owerre/take-home-fde). The Docker image
+remains local. Another day should prioritize Finance reconciliation of customer
 identity/status conflicts and obtaining subscription/payment history.

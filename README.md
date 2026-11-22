@@ -92,6 +92,6 @@ questions; never bake keys into the image.
 and [decisions](docs/decisions.md) explain how this was built. Actual effort is
 reported in the evaluation report; no one-hour-compliance claim is made. With
 another day, prioritize Finance reconciliation of identity/status conflicts and
-subscription/payment history. Publication is on hold at the user's request;
-[the intended GitHub repository](https://github.com/Owerre/take-home-fde) has not
-been pushed by this agent.
+subscription/payment history.
+
+[GitHub repository](https://github.com/Owerre/take-home-fde).

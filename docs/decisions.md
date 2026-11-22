@@ -43,7 +43,8 @@ The unchanged CSV contains contact data and stays Git-ignored. Track the briefin
 and original exercise. Docker mounts the source read-only; the
 image excludes CSV, databases, .env and keys. Git identity was not configured, so
 commits explicitly use `Codex <codex@localhost>`; global identity was not changed.
-Publication is on hold. Reviewers need the exercise CSV through an authorized channel.
+Publication was authorized after validation and privacy checks. Reviewers need
+the exercise CSV through an authorized channel.
 
 ## D-006 — Maintainable scope and reproducibility
 
