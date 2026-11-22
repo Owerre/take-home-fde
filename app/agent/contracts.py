@@ -13,53 +13,49 @@ from app.metrics.catalog import definition
 
 
 def tool_schema() -> dict[str, object]:
-    """Metadata only; the local validator is authoritative even for forced tools."""
-    return {
+    """Separate closed tools avoid unsupported top-level union schemas."""
+    request_schema: dict[str, object] = {
         "type": "object",
         "additionalProperties": False,
-        "required": ["kind"],
+        "required": ["metric"],
         "properties": {
-            "kind": {"type": "string", "enum": [v.value for v in ResponseKind]},
-            "explanation": {"type": "string", "maxLength": 1000},
-            "request": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": ["metric"],
-                "properties": {
-                    "metric": {"type": "string", "enum": [v.value for v in Metric]},
-                    "group_by": {
-                        "type": ["string", "null"],
-                        "enum": [None, *[v.value for v in Dimension]],
-                    },
-                    "filters": {
-                        "type": "array",
-                        "maxItems": 10,
-                        "items": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "required": ["dimension", "operator", "values"],
-                            "properties": {
-                                "dimension": {
-                                    "type": "string",
-                                    "enum": [v.value for v in Dimension],
-                                },
-                                "operator": {"type": "string", "enum": ["eq", "in"]},
-                                "values": {
-                                    "type": "array",
-                                    "minItems": 1,
-                                    "maxItems": 20,
-                                    "items": {"type": "string", "maxLength": 128},
-                                },
-                            },
+            "metric": {"type": "string", "enum": [v.value for v in Metric]},
+            "group_by": {"type": ["string", "null"], "enum": [None, *[v.value for v in Dimension]]},
+            "filters": {
+                "type": "array",
+                "maxItems": 10,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["dimension", "operator", "values"],
+                    "properties": {
+                        "dimension": {"type": "string", "enum": [v.value for v in Dimension]},
+                        "operator": {"type": "string", "enum": ["eq", "in"]},
+                        "values": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 20,
+                            "items": {"type": "string", "maxLength": 128},
                         },
                     },
-                    "start_date": {"type": ["string", "null"]},
-                    "end_date": {"type": ["string", "null"]},
-                    "order": {"type": "string", "enum": ["asc", "desc"]},
-                    "limit": {"type": "integer", "minimum": 1, "maximum": 100},
                 },
             },
+            "start_date": {"type": ["string", "null"]},
+            "end_date": {"type": ["string", "null"]},
+            "order": {"type": "string", "enum": ["asc", "desc"]},
+            "limit": {"type": "integer", "minimum": 1, "maximum": 100},
         },
+    }
+    explanation_schema: dict[str, object] = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["explanation"],
+        "properties": {"explanation": {"type": "string", "minLength": 1, "maxLength": 1000}},
+    }
+    return {
+        ResponseKind.METRIC.value: request_schema,
+        ResponseKind.CLARIFICATION.value: explanation_schema,
+        ResponseKind.UNSUPPORTED.value: explanation_schema,
     }
 
 

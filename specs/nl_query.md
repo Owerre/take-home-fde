@@ -30,6 +30,11 @@
   - `{kind: "unsupported", explanation: string}`
   Explanations are bounded; final answers formatted locally. Raw model output is
   not executed, displayed as trusted evidence, or logged. Unknown fields reject.
+  Use automatic selection among interpret_metric, interpret_clarification and
+  interpret_unsupported. Each has a simple object schema; do not use forced tool
+  choice or a top-level union, which some models/APIs reject. The adapter maps
+  exactly one allowlisted call into the local kind/request/explanation contract.
+  Reject text-only, missing, extra or incorrectly named calls. No SQL fallback.
 - **N-REQ-02:** MetricRequest fields: `metric` (metrics.md allowlist), `group_by`
   (zero or one supported dimension), `filters` (≤10 typed filter objects), optional
   `start_date`, `end_date` (ISO exclusive upper), `order` (asc/desc), `limit` (1–100).

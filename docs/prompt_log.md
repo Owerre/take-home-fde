@@ -32,6 +32,7 @@ corrected. Strict typing errors were fixed without disabling strict mode.
 The briefing's FX rule was kept despite the source-generation pattern, and raw
 negative-paid records were not counted twice as both duplicate losers and rejects.
 
-This is a trimmed factual summary of work, not a complete transcript or a claim
-that a live Anthropic evaluation occurred. No earlier transcript was supplied.
+This is a trimmed factual summary of the initial build, not a complete transcript.
+Subsequent live validation results are recorded in eval_report.md. No earlier
+transcript was supplied.
 

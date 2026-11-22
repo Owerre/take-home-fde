@@ -1,5 +1,6 @@
 """Additional ingestion/security and real SDK-transport behavior, without credentials."""
 
+import json
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -75,8 +76,32 @@ def test_numeric_category_and_currency_contracts(tmp_path: Path) -> None:
         assert fetch_one(connection, "SELECT csat_score,industry FROM stg_invoices") == (None, None)
 
 
+@pytest.mark.parametrize(
+    "tool_name,tool_input,expected",
+    [
+        (
+            "interpret_metric",
+            {"metric": "paid_revenue"},
+            {"kind": "metric", "request": {"metric": "paid_revenue"}},
+        ),
+        (
+            "interpret_clarification",
+            {"explanation": "Paid or net?"},
+            {"kind": "clarification", "explanation": "Paid or net?"},
+        ),
+        (
+            "interpret_unsupported",
+            {"explanation": "No subscription history"},
+            {"kind": "unsupported", "explanation": "No subscription history"},
+        ),
+    ],
+)
 def test_sdk_retries_transport_only(
-    dataset: tuple[Settings, RunReport], monkeypatch: pytest.MonkeyPatch
+    dataset: tuple[Settings, RunReport],
+    monkeypatch: pytest.MonkeyPatch,
+    tool_name: str,
+    tool_input: dict[str, object],
+    expected: dict[str, object],
 ) -> None:
     settings, _ = dataset
     calls = 0
@@ -85,6 +110,8 @@ def test_sdk_retries_transport_only(
     def handler(request: httpx.Request) -> httpx.Response:
         nonlocal calls
         calls += 1
+        payload = json.loads(request.content)
+        assert payload["tool_choice"] == {"type": "auto", "disable_parallel_tool_use": True}
         if calls < 3:
             return httpx.Response(
                 429,
@@ -102,8 +129,8 @@ def test_sdk_retries_transport_only(
                     {
                         "type": "tool_use",
                         "id": "synthetic-tool",
-                        "name": "interpret",
-                        "input": {"kind": "unsupported", "explanation": "No subscription history"},
+                        "name": tool_name,
+                        "input": tool_input,
                     }
                 ],
                 "stop_reason": "tool_use",
@@ -120,9 +147,7 @@ def test_sdk_retries_transport_only(
     monkeypatch.setattr(anthropic, "Anthropic", factory)
     client = AnthropicClient(replace(settings, api_key="synthetic-test-key", model="test-model"))
     result = client.interpret("Historical MRR?", system_metadata(settings.root), tool_schema())
-    assert (
-        result == {"kind": "unsupported", "explanation": "No subscription history"} and calls == 3
-    )
+    assert result == expected and calls == 3
     calls = 0
     client = AnthropicClient(
         replace(settings, api_key="synthetic-test-key", model="test-model", model_retries=0)

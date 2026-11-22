@@ -32,7 +32,10 @@ interrupt deadlines implement the hardening requirement. Python Decimal finalize
 SQL numerators/denominators because DuckDB decimal division returns floating-point
 values ([DuckDB numeric types](https://duckdb.org/docs/stable/sql/data_types/numeric.html)).
 The SDK adapter follows the [official Python SDK](https://platform.claude.com/docs/en/api/sdks/python);
-actual live behavior remains unverified without credentials.
+live evaluation with claude-fable-5-2 passed 29/30 cases with one expected limitation.
+The adapter uses automatic selection among three simple, allowlisted tools and
+requires exactly one result. This avoids the model's forced-tool restriction and
+the API's top-level union-schema restriction without relaxing local validation.
 
 ## D-005 — Source privacy and honest attribution
 

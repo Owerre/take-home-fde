@@ -9,7 +9,7 @@ build:
 eval:
 	uv run --locked python -m app eval --tier 1
 eval-live:
-	uv run --locked python -m app eval --tier 2
+	uv run --env-file .env --locked python -m app eval --tier 2
 format:
 	uv run --locked ruff format app tests evals scripts
 	uv run --locked ruff check --fix app tests evals scripts

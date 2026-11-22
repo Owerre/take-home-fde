@@ -3,8 +3,8 @@
 **Local submission validated; publication is on hold.** All six stakeholder metric
 cases pass independent SQL and evidence checks. Tier 1 reports **12/13 PASS,
 1 expected limitation failure, 0 unexpected failures**. The regression suite passes
-**36 tests**. Live Anthropic accuracy is **NOT RUN** because credentials and model
-configuration were absent.
+**38 tests**. Live Tier 2 with **claude-fable-5-2** reports **29/30 PASS,
+1 expected historical-MRR limitation, 0 unexpected failures**.
 
 ## Configuration and reproducibility
 
@@ -12,9 +12,11 @@ configuration were absent.
 - Local Python 3.14.7; container Python 3.13.18, non-root UID 10001.
 - uv 0.13.9; DuckDB 1.5.6; Anthropic SDK 0.125.0; PyYAML 6.0.4; exact graph in uv.lock.
 - Source SHA-256: `f542bc1f8193ab367e0a009a7afe56620335ce23b5817f5edc0ed4f896c89d84`.
-- Verified host/container build identity: `433d5f7ae2ffd3d9a88a9943d3518ca000c6e0ee48e1cc00c2177afd42c3391e`.
-- Baseline account_id key; no answer cache. No model, cost or live latency figures
-  were measured. HTTP mock transport results are not live model results.
+- Verified host/container build identity: `a23a57ba41f5cff645863e5ef60c9faa1a7821bec6e9e0301a73eb302a900f90`.
+- Application model: **claude-fable-5-2**; automatic selection among three typed
+  tools; 30-second model timeout; at most two transport retries; no answer cache.
+- Per-request latency, token usage and API cost were not measured. HTTP mock tests
+  are separate from the real live evaluation results. The key is not recorded.
 
 ## Checks actually executed
 
@@ -24,13 +26,14 @@ configuration were absent.
 | `ruff format --check app tests evals scripts` | PASS; 34 files formatted |
 | `ruff check app tests evals scripts` | PASS |
 | `mypy` with strict configuration | PASS; 34 source files |
-| `pytest -q` | PASS; 36 tests |
+| `pytest -q` | PASS; 38 tests |
 | `python -m app build` on the real source | PASS; atomic artifact and complete row reconciliation |
 | `python -m app eval --tier 1` | 12 PASS; 1 expected FAIL; exit 0 |
 | Documented `uv run --locked python -m app eval --tier 1` in fresh environment, credentials removed | Same result; exit 0 |
 | `python -m evals --tier 1` in fresh environment | Same result; exit 0 |
-| `python -m app eval --tier 2` | NOT RUN; no key/model configured |
-| Natural-language command without key/model | Expected actionable ConfigurationError; exit 1 |
+| `uv run --env-file .env --locked python -m app eval --tier 2 --require-live` | 29 PASS; 1 expected FAIL; 0 unexpected failures; exit 0 |
+| Live Q1 natural-language command with `--env-file .env` | PASS; USD 32,686,371.20; 891 contributing invoices |
+| Natural-language command without exported key/model or explicit env-file | Expected ConfigurationError; use `--env-file .env` when settings are in a file |
 | `docker build -t cloudnova-track-b:local .` | PASS |
 | Non-root image / source and .env exclusion check | PASS; UID 10001; no private source or .env baked in |
 | Docker tier 1 with read-only CSV and writable named volume | Same 12 PASS / 1 expected FAIL; exit 0 |
@@ -91,6 +94,19 @@ execution or a model accuracy result. Ordinary unsupported/unsafe refusals are s
 No stakeholder question is marked as an expected failure. Unexpected failures or
 errors produce nonzero exits; missing live configuration is reported as NOT RUN.
 
+## Live per-case results
+
+The 30-case suite ran against claude-fable-5-2 using the same approved build and
+independent reference SQL as tier 1. All six canonical questions and two
+paraphrases per question passed. Q1, Q2 and Q5 were each repeated three times
+(canonical plus two repeats), with consistent results and no answer caching.
+The regional/date filter, revenue clarification, unsupported forecast, injection
+and personal-data cases passed. Injection and personal-data requests were refused
+locally before any model call; these are behavior checks, not model-call results.
+LIVE-HISTORY was scored FAIL as the expected exact-history capability limitation.
+No unexpected failures occurred. Live invoice evidence was checked against each
+request's actual population; SQL string matching was not used.
+
 ## Failures encountered and resolved
 
 The first profiler rejected € and £ prefixes; parsing was corrected. Per-cell raw
@@ -102,22 +118,28 @@ execution sandbox's uv-cache permissions before the app ran; the documented demo
 then passed with cache access. A deliverable audit also found that HISTORY originally declared a limitation
 without submitting a request. It now executes the backend, with regression tests
 for both rejection and unexpected acceptance. The README MRR formula was clarified
-to show the discount multiplier explicitly. All affected checks were rerun successfully.
+to show the discount multiplier explicitly. Live setup then exposed three issues:
+settings were saved in .env without being loaded, the model setting used a display
+name instead of an API ID, and the API/model rejected forced tool choice and a
+top-level union schema. The client now selects automatically among three simple
+tools, maps their payloads to the existing local contract, and rejects missing,
+extra, unknown or invalid responses. Setup instructions now show the env-file
+flag. All affected checks and the complete live suite were rerun successfully.
 
 ## Remaining limits and effort
 
-Live NL/paraphrase/repeat accuracy, real provider credentials, model latency and
-cost remain unmeasured. Tier 2 contains 30 defined cases and runs only when a key
-and model are provided. Snapshot MRR/churn cannot establish exact historical
+Live NL/paraphrase/repeat behavior was verified for the configured model on the
+30 defined cases; other models remain untested. Model latency and cost remain
+unmeasured. Tier 2 requires a locally configured API key and model ID. Snapshot MRR/churn cannot establish exact historical
 subscription states, causal churn or cash settlement. Status precedence is a
 convention without event timestamps; account identity remains uncertain. Raw data
 must be supplied through an authorized channel to reproduce a fresh clone.
 
 The user selected a 24-hour maximum. Estimated cumulative active effort is roughly
-**65 minutes**, including tool waits and excluding the multi-hour M1 review wait;
+**85 minutes**, including tool waits and excluding the multi-hour M1 review wait;
 this is an estimate, not a stopwatch measurement or a one-hour-compliance claim.
-The initial implementation estimate was 55 minutes; subsequent documentation
-cleanup and the deliverable audit added approximately 10 minutes. M1 was
+The initial implementation estimate was 55 minutes; follow-up cleanup, audits
+and live integration troubleshooting added approximately 30 minutes. M1 was
 approximately 8 minutes; the observed implementation/check interval began
 at 00:30:44 UTC on 2026-11-22 and reached 01:11:42 UTC, with preliminary setup and
 final cleanup outside those clock readings. No GitHub push or image publication

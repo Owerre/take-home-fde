@@ -7,6 +7,8 @@ from anthropic.types import ToolParam
 
 from app.config import Settings
 from app.domain.errors import ConfigurationError, InterpretationError
+from app.domain.models import ResponseKind
+from app.metrics.validation import mapping
 
 
 class ModelClient(Protocol):
@@ -26,11 +28,21 @@ class AnthropicClient:
         self.settings = settings
 
     def interpret(self, question: str, metadata: str, schema: dict[str, object]) -> object:
-        tool: ToolParam = {
-            "name": "interpret",
-            "description": "Classify a supported metric request",
-            "input_schema": schema,
-        }
+        tools: list[ToolParam] = []
+        allowed_names: dict[str, ResponseKind] = {}
+        for kind in ResponseKind:
+            name = f"interpret_{kind.value}"
+            definition = schema[kind.value]
+            if not isinstance(definition, dict):
+                raise ConfigurationError("Interpretation tool schema must be an object.")
+            tools.append(
+                {
+                    "name": name,
+                    "description": f"Return a {kind.value} interpretation",
+                    "input_schema": definition,
+                }
+            )
+            allowed_names[name] = kind
         try:
             with anthropic.Anthropic(
                 api_key=self.settings.api_key,
@@ -42,19 +54,22 @@ class AnthropicClient:
                     max_tokens=1200,
                     system=metadata,
                     messages=[{"role": "user", "content": question}],
-                    tools=[tool],
+                    tools=tools,
                     tool_choice={
-                        "type": "tool",
-                        "name": "interpret",
+                        "type": "auto",
                         "disable_parallel_tool_use": True,
                     },
                 )
             calls = [block for block in message.content if block.type == "tool_use"]
-            if len(calls) != 1 or calls[0].name != "interpret":
+            if len(calls) != 1 or calls[0].name not in allowed_names:
                 raise InterpretationError(
                     "Model did not supply exactly one interpretation tool call."
                 )
-            return calls[0].input
+            kind = allowed_names[calls[0].name]
+            if kind == ResponseKind.METRIC:
+                return {"kind": kind.value, "request": calls[0].input}
+            explanation = mapping(calls[0].input, {"explanation"}, {"explanation"})
+            return {"kind": kind.value, "explanation": explanation["explanation"]}
         except anthropic.APIError as exc:
             raise InterpretationError(
                 "Anthropic request failed; verify credentials/model/network or retry."

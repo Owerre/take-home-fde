@@ -5,9 +5,10 @@ This work uses OpenAI Codex through the desktop/API agent environment. No Claude
 Code, Cursor, or Copilot configuration is active. The exact runtime model ID was
 not exposed to this session; do not invent one. No subagents were used.
 Tools used: shell, Python, Git, uv, Ruff, mypy, pytest and local Docker.
-No customer rows were sent to an external model endpoint. Live Anthropic calls
-were not run because credentials/model configuration were absent. The SDK was
-verified with an injected client and HTTP mock transport. No subagents were used.
+No customer rows were sent to an external model endpoint. SDK tests use an
+injected client and HTTP mock transport. Live interpretation was subsequently
+validated with claude-fable-5-2: 29/30 cases, one expected historical-MRR limitation,
+zero unexpected failures. Keys remain in the ignored local .env file.
 
 ## Working agreement
 - Read docs/build_brief.md, data/BUSINESS_CONTEXT.md and the original exercise.
@@ -28,7 +29,8 @@ verified with an injected client and HTTP mock transport. No subagents were used
 - Flat uppercase constants belong in app/config.py; Settings validates overrides.
 - `uv sync --locked` installs the exact environment; `make check test` validates it.
 - `python -m app build` and `python -m app eval --tier 1` require no credentials.
-- Questions and tier 2 require explicit ANTHROPIC_API_KEY and ANTHROPIC_MODEL.
+- Questions and tier 2 require ANTHROPIC_API_KEY and an API ID in ANTHROPIC_MODEL.
+- Use `uv run --env-file .env --locked ...` to load local settings explicitly.
 - `python -m evals --tier 1` runs the evaluation package directly.
 - Validate Docker locally; private CSV is a read-only runtime mount, never image input.
 - M1 was approved before implementation. Record actual results in docs/eval_report.md.

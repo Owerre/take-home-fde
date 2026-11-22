@@ -16,24 +16,24 @@ uv sync --locked
 uv run --locked python -m app eval --tier 1
 ```
 
-The second command is a complete **offline demo** of all six metrics, independent
-reference SQL, hand-computed fixtures and population evidence. No credentials or
-network are needed after setup. An expected exact-history limitation is printed
-as FAIL and counted; unexpected failures make the command exit nonzero.
+The demo checks six metrics against independent SQL, hand-computed fixtures,
+and invoice evidence. No credentials required. An expected historical-MRR
+failure is counted; unexpected failures exit nonzero.
 
 ## Natural-language questions
 
-Set `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` in your environment, then run:
+Copy `.env.example` to `.env`, set `ANTHROPIC_API_KEY` and an [API model ID](https://platform.claude.com/docs/en/models/overview)
+(not a display name) in `ANTHROPIC_MODEL`, then run:
 
 ```sh
-uv run --locked python -m app "What was our total recognized revenue in USD for paid invoices in 2024?"
+uv run --env-file .env --locked python -m app "What was our total recognized revenue in USD for paid invoices in 2024?"
 ```
 
 This builds automatically when source/rules change. Anthropic receives the question
 and metadata only; validated structured output becomes deterministic SQL. Answers
 are formatted locally. Model-generated SQL is never accepted. Missing credentials
-cause an actionable nonzero exit. `.env.example` lists settings; `.env` is not
-loaded implicitly. File/default constants live in [app/config.py](app/config.py);
+cause an actionable nonzero exit. `--env-file .env` loads the settings explicitly;
+omit that option if both variables are already exported. File/default constants live in [app/config.py](app/config.py);
 interpretation instructions live in [prompts/query_agent.yaml](prompts/query_agent.yaml).
 
 Other commands:
@@ -53,10 +53,10 @@ The SDK uses bounded retries; query connections restrict access and execution.
 The user approved M1 before implementation. [Schema](specs/schema.md),
 [metrics](specs/metrics.md), [query/security](specs/nl_query.md), and
 [evals](specs/evals.md) carry stable rule IDs; Q1/Q3/Q6 include hand-reproduction
-instructions. [Actual checks and results](docs/eval_report.md) distinguish verified
-behavior from live evaluations that were not run.
+instructions. [Actual checks and results](docs/eval_report.md) record offline
+and live validation.
 
-All six metric cases pass; live NL accuracy remains unverified without credentials.
+Offline: 12/13; live: 29/30. Both include one expected historical-MRR failure.
 
 The source reconciles **5,125 = 5,000 retained + 125 duplicate losers + 0 rejects**.
 At reference date **2026-11-21**, 103 future invoices remain stored and are excluded
