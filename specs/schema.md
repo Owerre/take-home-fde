@@ -67,7 +67,8 @@ summarized in `docs/m1_review.md`.
 - **S-VALID-01:** Validate raw candidate keys and category/date parsing before
   dedup selection; preserve invalid candidate reasons. Required/range/sign rules
   apply to the selected record. Invalid candidates cannot outrank parseable ones;
-  if all candidates are invalid, all are rejects. Never fall back to a lower-ranked
+  if all distinct candidates are invalid, each representative is rejected (exact
+  copies remain duplicate losers). Never fall back to a lower-ranked
   candidate after a selected record fails sign/range validation. Date before signup
   is retained with a quality flag (uncertain account attributes); no chronological
   repair. Future invoice dates are retained and flagged, not rejects.

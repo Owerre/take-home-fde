@@ -106,6 +106,25 @@ From my first pass. Verify each in your own profile, and look for more:
   does; slash dates are month/day/year.
 - Two rows are paid with negative amounts. Invoice dates run to July 2027.
 
+## Application organization and configuration
+
+- Organize the Python application into cohesive packages: domain, pipeline,
+  metrics, agent, evaluation, and infrastructure. Keep CLI entry points thin.
+  Do not place the whole implementation in a flat app directory.
+- Store natural-language interpretation instructions in a versioned YAML file
+  under prompts/, separate from Python source. Load YAML safely; Python retains
+  ownership of structured contracts and validation.
+- Use flat uppercase configuration constants in app/config.py with descriptive
+  names such as SOURCE_FILE, PROMPT_FILE, TRANSFORM_SQL_FILE, ALIASES_FILE,
+  LIST_PRICES_FILE, and FX_RATES_FILE. Retain the frozen typed Settings dataclass
+  for validated per-run configuration and environment overrides.
+- Provide Docker support: a Dockerfile, a restrictive .dockerignore, a non-root
+  runtime, locked dependencies, read-only source mounts, and setup/run commands.
+  Exclude private data and secrets from the image. Report actual build/run checks;
+  do not claim verification if Docker is unavailable.
+- Continue local implementation and validation, but do not push or publish until
+  the user explicitly renews publication authorization.
+
 ## Code standards
 
 - Frozen, typed dataclasses for Settings, RunReport, MetricDefinition,
@@ -180,8 +199,8 @@ Verify documented setup and demo commands from a clean environment.
   Check tracked files before publication and obtain publication authorization
   if it has not already been provided.
 
-Query guardrails satisfy the hardening requirement. API, Docker, CI, caching,
-and sensitivity analysis are optional after the required submission passes.
+Query guardrails satisfy the hardening requirement. API, CI, caching,
+and additional sensitivity analysis are optional after the required submission passes.
 No frontend, vector store, cloud deployment, or unrelated features.
 
 Finish with what was built, checks actually run, failures, remaining limits,

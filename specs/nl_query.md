@@ -60,6 +60,11 @@
   templates; table/column/operator/order identifiers come only from code allowlists.
   Bind every filter/date/limit value. No arbitrary SQL fallback, even after model
   failure or injection. Revalidate model and direct programmatic requests equally.
+  DuckDB decimal division produces floating-point values; therefore SQL returns
+  exact DECIMAL totals and integer denominators for averages/rates. Local Decimal
+  division, ordering and top-N selection follow, over at most four allowed groups.
+  Invoice sums/rankings remain SQL-compiled and limited. Display this finalization
+  assumption with average/rate answers; evidence still uses the same population.
 - **N-SEC-01:** Use read-only DuckDB connections with external access and extension
   auto-install/load disabled, configuration locked, bounded memory and thread
   settings. Expose only dedicated marts through compiler templates; raw/rejects
@@ -88,3 +93,19 @@
   do not inflate revenue contribution counts with snapshot-only records. Empty
   results have zero contributions and empty samples. Include conflict/future/FX
   caveats from the actual build rather than generic invented issue counts.
+
+## Follow-up user requirements
+
+**N-PROMPT-01:** Interpretation instructions live in versioned
+`prompts/query_agent.yaml`, loaded using safe YAML parsing. Python owns the tool
+contract and validation; prompt text does not live in Python source. Prompt version
+and bytes participate in build identity.
+
+**N-LAYOUT-01:** Organize code in domain, pipeline, metrics, agent, evaluation and
+infrastructure packages. Define flat uppercase file/path/default constants in
+app/config.py; Settings validates per-run values and environment overrides.
+
+**N-DOCKER-01:** Supply a non-root Docker image and documented commands; never
+include private CSV, databases, .env or secrets in build context. Mount source
+read-only at runtime. Verify the image with a local Docker daemon when available;
+otherwise state explicitly that the container build/run is not verified.
