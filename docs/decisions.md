@@ -36,8 +36,8 @@ actual live behavior remains unverified without credentials.
 
 ## D-005 — Source privacy and honest attribution
 
-The unchanged CSV contains contact data and stays Git-ignored. Track the briefing,
-original exercise and source checksums. Docker mounts the source read-only; the
+The unchanged CSV contains contact data and stays Git-ignored. Track the briefing
+and original exercise. Docker mounts the source read-only; the
 image excludes CSV, databases, .env and keys. Git identity was not configured, so
 commits explicitly use `Codex <codex@localhost>`; global identity was not changed.
 Publication is on hold. Reviewers need the exercise CSV through an authorized channel.
