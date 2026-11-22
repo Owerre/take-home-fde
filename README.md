@@ -1,65 +1,97 @@
 # CloudNova Track B
 
-**M1 checkpoint: profile and proposed specs are ready for review. The application
-is not implemented yet.** This project will clean a private invoice ledger with
-Python, DuckDB and set-based SQL, then answer six stakeholder questions through
-an Anthropic interpretation layer and a deterministic metric compiler.
+A local, spec-driven invoice pipeline and natural-language metric agent. Python
+and set-based DuckDB SQL preserve raw lineage, normalize/deduplicate invoices,
+build account snapshots, and answer all six stakeholder questions with the exact
+query, parameters, definitions, caveats and bounded invoice evidence.
 
-Start with [M1 decisions and sensitivity](docs/m1_review.md). Explicit approval
-is required before implementing the pipeline, agent and evaluations.
+## Setup and a single demo command
 
-## Run what exists
-
-Use Python 3.13 or 3.14 (verified locally on 3.14.7). No packages or key required:
-
-```sh
-python3 scripts/profile_data.py
-```
-
-This regenerates [data quality](docs/data_quality.md) from
-`data/cloudnova_invoices.csv`. Raw CSV is private and Git-ignored; reviewers need
-their authorized exercise CSV at that path. Verify bytes with
-[input checksums](docs/input_checksums.json). Original sources were moved unchanged.
-
-## Commands after approval (specified, not runnable yet)
+Use Python 3.13 or 3.14 on macOS/Linux and uv **0.13.9** (`python3 -m pip install uv==0.13.9`).
+From this repository, place the authorized exercise CSV at
+`data/cloudnova_invoices.csv` (already present locally, deliberately Git-ignored):
 
 ```sh
-python -m app build
-python -m app eval --tier 1
-python -m app "What was our total recognized revenue in USD for paid invoices in 2024?"
-python -m app eval --tier 2
+uv sync --locked
+uv run --locked python -m app eval --tier 1
 ```
 
-The question/demo and live tier 2 need ANTHROPIC_API_KEY and ANTHROPIC_MODEL.
-Build and offline tier 1 will not. `.env.example` documents proposed settings;
-no dotenv loader exists yet. The final clean-environment setup and package lock
-will be supplied with implementation.
+The second command is a complete **offline demo** of all six metrics, independent
+reference SQL, hand-computed fixtures and population evidence. No credentials or
+network are needed after setup. An expected exact-history limitation is printed
+as FAIL and counted; unexpected failures make the command exit nonzero.
 
-## Contract and findings
+## Natural-language questions
 
-[Schema](specs/schema.md), [metrics](specs/metrics.md), [query/security](specs/nl_query.md),
-[evals](specs/evals.md) define stable rule IDs. Q1/Q3/Q6 include hand-reproduction
-filters. The profile verified 5,125 rows, 5,000 invoice IDs, 82 exact duplicate
-losers and 43 status-only conflicts. Account attributes conflict extensively.
-The M1 review quantifies Q2/Q4/Q5 movement under the alternate account-name key.
+Set `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` in your environment, then run:
 
-Proposals: day-first hyphens; void/refunded precedence; latest eligible invoice
-snapshot keyed by account_id; paid/nonchurned active proxy; all-account average
-MRR denominator; invoice-date revenue; reference date 2026-11-21. Fixed FX follows
-the briefing despite the systematic source anomaly. Annual invoices bill ten
-months; annual MRR is still list×seats×discount once per active account.
+```sh
+uv run --locked python -m app "What was our total recognized revenue in USD for paid invoices in 2024?"
+```
 
-## Validation and limits
+This builds automatically when source/rules change. Anthropic receives the question
+and metadata only; validated structured output becomes deterministic SQL. Answers
+are formatted locally. Model-generated SQL is never accepted. Missing credentials
+cause an actionable nonzero exit. `.env.example` lists settings; `.env` is not
+loaded implicitly. File/default constants live in [app/config.py](app/config.py);
+interpretation instructions live in [prompts/query_agent.yaml](prompts/query_agent.yaml).
 
-[Evaluation report](docs/eval_report.md) distinguishes actual checks from planned
-ones. There are no pipeline, tier-1 or live eval results yet. Missing subscription
-history prevents exact historical MRR and period churn. Future invoice dates
-require an explicit horizon. No GitHub publication has been authorized or attempted.
+Other commands:
 
-[Architecture](docs/architecture.md) marks implemented vs proposed paths.
-[AGENTS.md](AGENTS.md), [build brief](docs/build_brief.md),
-[prompt record](docs/prompt_log.md) and [decision records](docs/decisions.md) show
-actual AI use and scope. M1 active effort is recorded in the evaluation report;
-review waiting time is excluded. No claim of one-hour compliance is made.
-After completing the narrow required submission, another day would be best spent
-reconciling customer identity and obtaining subscription/payment history with Finance.
+```sh
+uv run --locked python -m app build
+uv run --locked python -m app eval --tier 2
+make check test
+```
+
+Build and tier 1 need no key. Tier 2 is live and requires a key/model; without them
+it prints **NOT RUN**, never PASS. Add `--require-live` to fail when unavailable.
+The SDK uses bounded retries; query connections restrict access and execution.
+
+## Rules, results and trade-offs
+
+The user approved M1 before implementation. [Schema](specs/schema.md),
+[metrics](specs/metrics.md), [query/security](specs/nl_query.md), and
+[evals](specs/evals.md) carry stable rule IDs; Q1/Q3/Q6 include hand-reproduction
+instructions. [Actual checks and results](docs/eval_report.md) distinguish verified
+behavior from live evaluations that were not run.
+
+All six metric cases pass; live NL accuracy remains unverified without credentials.
+
+The source reconciles **5,125 = 5,000 retained + 125 duplicate losers + 0 rejects**.
+At reference date **2026-11-21**, 103 future invoices remain stored and are excluded
+from answers. Fixed FX follows the briefing despite the source-generation anomaly;
+no billed amount is silently repaired. Annual bills ten months; MRR uses list
+price × seats × discount once/account, independent of billing cycle.
+
+Baseline account identity is account_id, with coherent latest eligible invoice
+snapshots. Active MRR is a paid/nonchurned proxy; regional averages include inactive
+accounts at zero. Conflicting names and dates do not prove separate customers.
+[Account-key sensitivity](docs/m1_review.md) quantifies Q2/Q4/Q5 movement. Churn is
+observed flag prevalence; exact historical MRR, churn events and cash settlement
+cannot be recovered from this ledger. Missing CSAT stays unknown. MRR/rates use
+exact Decimal finalization of SQL totals and denominators.
+
+## Docker
+
+```sh
+docker build -t cloudnova-track-b:local .
+docker run --rm \
+  --mount type=bind,src="$PWD/data/cloudnova_invoices.csv",dst=/input/invoices.csv,readonly \
+  --mount type=volume,src=cloudnova-build,dst=/app/build \
+  cloudnova-track-b:local eval --tier 1
+```
+
+The image runs as a non-root user. Private CSV, databases and secrets are excluded
+from its build context. The same command with `build` builds only. Pass environment
+variables using Docker's `--env ANTHROPIC_API_KEY --env ANTHROPIC_MODEL` for live
+questions; never bake keys into the image.
+
+[Architecture and package map](docs/architecture.md), [AI configuration](AGENTS.md),
+[consolidated brief](docs/build_brief.md), [trimmed prompt record](docs/prompt_log.md),
+and [decisions](docs/decisions.md) explain how this was built. Actual effort is
+reported in the evaluation report; no one-hour-compliance claim is made. With
+another day, prioritize Finance reconciliation of identity/status conflicts and
+subscription/payment history. Publication is on hold at the user's request;
+[the intended GitHub repository](https://github.com/Owerre/take-home-fde) has not
+been pushed by this agent.

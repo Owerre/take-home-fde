@@ -66,7 +66,7 @@ customer identities are intentionally omitted from committed profiling outputs.
 
 ## Review boundary
 
-Approve these defaults and the four specs, or identify rule IDs to change. Approval
-authorizes local implementation and routine validation; it does not authorize
-GitHub publication. No repository remote or reviewer identity has been supplied.
-Publication review will occur after a concrete completed submission is checked.
+M1 defaults and the four specs were approved before implementation. Routine local
+implementation and validation proceeded under that approval. The intended remote
+is https://github.com/Owerre/take-home-fde.git. Publication is on hold at the user's
+request; no push has been performed.
