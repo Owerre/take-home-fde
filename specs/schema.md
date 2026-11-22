@@ -3,7 +3,7 @@
 Authority: the original exercise and `data/BUSINESS_CONTEXT.md`; user-specific
 constraints in `docs/build_brief.md` take precedence. IDs below are stable.
 M1 approved by the user with “yes” after the conditional commit/push request. Decisions are
-summarized in `docs/m1_review.md`.
+summarized in `docs/decisions.md`.
 
 ## Storage and lineage
 

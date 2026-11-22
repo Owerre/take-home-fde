@@ -67,7 +67,7 @@ price × seats × discount once/account, independent of billing cycle.
 Baseline account identity is account_id, with coherent latest eligible invoice
 snapshots. Active MRR is a paid/nonchurned proxy; regional averages include inactive
 accounts at zero. Conflicting names and dates do not prove separate customers.
-[Account-key sensitivity](docs/m1_review.md) quantifies Q2/Q4/Q5 movement. Churn is
+[Account-key sensitivity](docs/decisions.md#account-key-sensitivity) quantifies Q2/Q4/Q5 movement. Churn is
 observed flag prevalence; exact historical MRR, churn events and cash settlement
 cannot be recovered from this ledger. Missing CSAT stays unknown. MRR/rates use
 exact Decimal finalization of SQL totals and denominators.

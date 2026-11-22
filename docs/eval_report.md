@@ -62,7 +62,7 @@ from this committed report; local answers contain bounded invoice-ID evidence.
 | Q6 — pending/failed exposure | **873 invoices; USD 28,682,929.79** | Pending/failed invoices only |
 
 Plain-language definitions and exact hand-reproduction filters for Q1/Q3/Q6 are
-in [metrics.md](../specs/metrics.md). [M1 sensitivity](m1_review.md) quantifies
+in [metrics.md](../specs/metrics.md). [M1 sensitivity](decisions.md#account-key-sensitivity) quantifies
 Q2/Q4/Q5 movement under the composite account-name key. Full-data build:
 **5,125 = 5,000 retained + 125 duplicate losers + 0 rejects**; 103 future invoices
 remain stored and are excluded from answers; 3,752 eligible account snapshots;

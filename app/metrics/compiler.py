@@ -162,7 +162,7 @@ class MetricCompiler:
             "billed amounts unchanged.",
             "Snapshot MRR is a paid/nonchurned proxy; "
             "churn is flag prevalence, not a historical event rate.",
-            "Baseline account_id; alternate-key Q2/Q4/Q5 sensitivity: docs/m1_review.md.",
+            "Baseline account_id; alternate-key Q2/Q4/Q5 sensitivity: docs/decisions.md.",
         )
         return Answer(
             ResponseKind.METRIC,
