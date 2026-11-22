@@ -1,0 +1,51 @@
+domain,alias,canonical
+plan,starter,Starter
+plan,start,Starter
+plan,tier 1,Starter
+plan,pro,Pro
+plan,professional,Pro
+plan,tier 2,Pro
+plan,enterprise,Enterprise
+plan,ent,Enterprise
+plan,tier 3,Enterprise
+status,paid,paid
+status,complete,paid
+status,completed,paid
+status,success,paid
+status,pending,pending
+status,in_review,pending
+status,awaiting,pending
+status,failed,failed
+status,declined,failed
+status,error,failed
+status,refunded,refunded
+status,refund,refunded
+status,charged_back,refunded
+status,void,void
+status,cancelled,void
+status,canceled,void
+billing_cycle,monthly,monthly
+billing_cycle,annual,annual
+billing_cycle,annually,annual
+billing_cycle,yearly,annual
+payment_method,credit_card,credit_card
+payment_method,credit card,credit_card
+payment_method,ach,ACH
+payment_method,wire,wire
+payment_method,wire transfer,wire
+payment_method,invoice,invoice
+churned,true,true
+churned,yes,true
+churned,1,true
+churned,y,true
+churned,false,false
+churned,no,false
+churned,0,false
+churned,n,false
+region,na,NA
+region,emea,EMEA
+region,apac,APAC
+region,latam,LATAM
+currency,usd,USD
+currency,eur,EUR
+currency,gbp,GBP
